@@ -60,13 +60,10 @@ def classify_example(word_counts):
     ham_probability = ham_prior
     for word, count in word_counts.items():
         for i in range(count):
-            spam_probability *= math.log(spam_likelihoods[word] if spam_likelihoods[word] > 0 else 1)
-            ham_probability *= math.log(ham_likelihoods[word] if ham_likelihoods[word] > 0 else 1)
-    if spam_probability == 0 and ham_probability == 0:
-        return None
+            spam_probability *= math.log(spam_likelihoods[word]) if spam_likelihoods[word] > 0 else 1
+            ham_probability *= math.log(ham_likelihoods[word]) if ham_likelihoods[word] > 0 else 1
     return 'spam' if spam_probability > ham_probability else 'ham'
 
-none_count = 0
 correct_count = 0.0
 total_count = 0.0
 test_file = open('test', 'r')
@@ -84,9 +81,5 @@ for line in test_file:
     if predicted_classification == actual_classification:
         correct_count += 1
     total_count += 1
-    # if total_count > 5:
-    #     break
 
 print 'Percentage correct: ' + str(correct_count / total_count)
-    
-print none_count
