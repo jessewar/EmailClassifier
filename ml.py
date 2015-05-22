@@ -8,21 +8,21 @@ def top_five_words(word_likelihoods):
         print 'word: ' + word + ', ' + 'probability: ' + str(probability)
 
 # Compute m-estimates for each word
-def get_word_likelihoods(word_counts, m, n, p):
+def get_word_likelihoods(word_counts, vocabulary, m, n, p):
     word_likelihoods = Counter()
-    for word in word_counts:
+    for word in vocabulary:
         n_c = word_counts[word]
         word_likelihoods[word] = (n_c + m * p) / (n + m)
     return word_likelihoods
 
 # Classifies a new email as 'spam' or 'ham' based on its word counts
 def classify_example(word_counts, spam_prior, ham_prior, spam_likelihoods, ham_likelihoods):
-    spam_probability = spam_prior
-    ham_probability = ham_prior
+    spam_probability = math.log(spam_prior)
+    ham_probability = math.log(ham_prior)
     for word, count in word_counts.items():
         for i in range(count):
-            spam_probability *= math.log(spam_likelihoods[word]) if spam_likelihoods[word] > 0 else 1
-            ham_probability *= math.log(ham_likelihoods[word]) if ham_likelihoods[word] > 0 else 1
+            spam_probability += math.log(spam_likelihoods[word])# if spam_likelihoods[word] > 0 else 1
+            ham_probability += math.log(ham_likelihoods[word])# if ham_likelihoods[word] > 0 else 1
     return 'spam' if spam_probability > ham_probability else 'ham'
 
 # Get prior probabilities of spam and ham
@@ -56,8 +56,8 @@ for line in training_file:
 # Classify new data
 ham_prior = ham_count / total_count
 spam_prior = spam_count / total_count
-spam_likelihoods = get_word_likelihoods(spam_word_counts, len(vocabulary), sum(spam_word_counts.values()), 1.0 / len(vocabulary))
-ham_likelihoods = get_word_likelihoods(ham_word_counts, len(vocabulary), sum(ham_word_counts.values()), 1.0 / len(vocabulary))        
+spam_likelihoods = get_word_likelihoods(spam_word_counts, vocabulary, len(vocabulary), sum(spam_word_counts.values()), 1.0 / len(vocabulary))
+ham_likelihoods = get_word_likelihoods(ham_word_counts, vocabulary, len(vocabulary), sum(ham_word_counts.values()), 1.0 / len(vocabulary))        
 
 correct_count = 0.0
 total_count = 0.0
